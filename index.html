@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+
+    <style>
+        #map{
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+
+
+</head>
+<body>
+
+    <h1>My Google Map</h1>
+
+    <input type="number" id="lat" placeholder="Enter latitude" >
+    <input type="number" id="lng" placeholder="Enter longitude" >
+    <input type="text" id="place" placeholder="Enter place">
+    <input type="button" value="Submit" onclick="locationInput()" id="submit">
+
+    <div id="map"></div>
+
+    <script src="https://cdn.firebase.com/js/client/2.3.2/firebase.js"></script>
+
+
+<script src="main.js"></script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ERVkND2Lrrd-OvTlueHhZq2liTShthc&libraries=visualization&callback=initMap">
+    </script>
+
+</body>
+</html>
