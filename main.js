@@ -1,7 +1,24 @@
-//firebase real-time database api
-var firebase = new Firebase('https://map-project-266d6.firebaseio.com/');
+//firebase configuration
+var firebaseConfig = {
+    apiKey: "AIzaSyC3i_VIJWm9GbwwDYbVASldzHp_FO_VUEo",
+    authDomain: "map-project-266d6.firebaseapp.com",
+    databaseURL: "https://map-project-266d6.firebaseio.com",
+    projectId: "map-project-266d6",
+    storageBucket: "map-project-266d6.appspot.com",
+    messagingSenderId: "876572778116",
+    appId: "1:876572778116:web:f3e3e24681b95431"
+  };
+firebase.initializeApp(firebaseConfig);
+ 
+//reference to firebase node
+var clickRef = firebase.database().ref('clicks');
 
+//initial arrays
+var latitudes = [];
+var longitudes = [];
+var places = [];
 
+var map;
 //initial data inputs
 var data = {
     place: null,
@@ -9,31 +26,13 @@ var data = {
     longitude: null,
 };
 
-
 //map settings
 var options = {
     zoom:12,
     center:{lat: 27.7172, lng: 85.3240}
 };
 
-
-// Dummy data for showing markers
-var markers = [
-    {
-        coords:{lat: 27.7172, lng: 85.3240},
-        placeName:'<h1>Kathmandu</h1>'
-    },
-    {
-        coords:{lat:27.6710,lng:85.4298},
-        placeName:'<h1>Bhaktapur</h1>'
-    },
-    {
-        coords:{lat:27.6644,lng:85.3188},
-        placeName:'<h1>Lalitpur</h1>'
-    }
-];
-
-//user input for describing the name of place along with latitude and longitude
+//user input
 function locationInput() {
     var place = document.getElementById('place');
     var latitude = document.getElementById('lat');
@@ -72,59 +71,51 @@ function locationInput() {
 
 }
 
-//storing data to firebase database
+//add to firebase
 function addToFirebase(data) {
-    var ref = firebase.child('clicks').push(data, function (err) {
-        if (err) {  // Data was not written to firebase.
+    
+    clickRef.push(data, function(err){
+        if(err){
             console.warn(err);
         }
 
-        if (ref) {
-            console.log('Successful...');
+        if(clickRef){
+            console.log('Successful.');
         }
     });
+    
 }
 
-
-//async callback function called from map api
+//map callback function 
 function initMap() {
+    //map initialization
+    map = new google.maps.Map(document.getElementById('map'), options);
+    
+    clickRef.on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            var childData = childSnapshot.val();
+            placeName = childData.place;
+            places.push(childData.place);
+            lats = Number(childData.latitude);
+            latitudes.push(lats);
+            lngs = Number(childData.longitude);
+            longitudes.push(lngs);
 
-    // New map
-    var map = new google.maps.Map(document.getElementById('map'), options);
+            console.log('lats::', lats);
+            console.log('longs', lngs);
 
-    // Listen for click on map
-    google.maps.event.addListener(map, 'click', function(event){
-        // Add marker
-        addMarker({coords:event.latLng});
-    });
+      var myLatLng = {lat: lats, lng: lngs};
 
-
-    // Loop through markers
-    for(var i = 0;i < markers.length;i++){
-        // Add marker
-        addMarker(markers[i]);
-    }
-
-    // Add new markers function
-    function addMarker(props){
+      //add marker
         var marker = new google.maps.Marker({
-            position:props.coords,
-            map:map,
+          position: myLatLng,
+          map: map,
+          title: placeName
         });
 
+        });
+    });
 
-        // Check placeName
-        if(props.placeName){
-            var infoWindow = new google.maps.InfoWindow({
-                placeName:props.placeName
-            });
-
-
-            //display marker's place name info on marker clicks
-            marker.addListener('click', function(){
-                infoWindow.open(map, marker);
-            });
-        }
-    }
-
+    console.log('latitudes is::::',latitudes);
+    
 }
